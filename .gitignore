@@ -11,6 +11,8 @@ Thumbs.db
 .freebuff/
 .idea/
 .vscode/
+__pycache__/
+*.pyc
 *.swp
 *.swo
 *~

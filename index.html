@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>xcc2 - Regulace vytápění</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.85);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0ea5e9;
+      --heat: #f97316;
+      --water: #06b6d4;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* Header & Navigation */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 8px 0;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--heat), var(--primary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+    }
+
+    .logo-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-title p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    .badge-heat { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }
+    .badge-water { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
+    .badge-online { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+
+    /* Temperature Display Grid */
+    .temp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 480px) {
+      .temp-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .temp-block {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .temp-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .temp-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #fff;
+    }
+
+    .temp-value.heat { color: #fdba74; }
+    .temp-value.water { color: #67e8f9; }
+    .temp-value.req { color: #f8fafc; }
+
+    .temp-unit {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 2px;
+    }
+
+    /* Stepper Controls */
+    .stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .btn-step {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1.4rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-step:active {
+      transform: scale(0.92);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .stepper-val {
+      font-size: 1.5rem;
+      font-weight: 700;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    /* Status footer */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 12px;
+      margin-top: 8px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      margin-right: 6px;
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    .dot.busy {
+      background: var(--heat);
+      box-shadow: 0 0 8px var(--heat);
+    }
+
+    /* Login Form Styles */
+    .login-box {
+      max-width: 400px;
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    .login-icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, var(--heat), var(--primary));
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
+    }
+
+    .login-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      color: #fff;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      border: none;
+      color: #0f172a;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+      opacity: 0.9;
+    }
+
+    .alert {
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .alert-danger {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      border: 1px solid var(--primary);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      z-index: 100;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .settings-toggle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-top: 14px;
+      display: inline-block;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- LOGIN VIEW -->
+    <div id="view-login" class="login-box card" style="display: none;">
+      <div class="login-icon">🔥</div>
+      <h2 class="login-title">xcc Regulace</h2>
+      <p class="login-subtitle">Přihlaste se pro ovládání topení a TUV</p>
+
+      <div id="login-alert" class="alert alert-danger"></div>
+
+      <form id="form-login" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Uživatelské jméno</label>
+          <input type="text" id="input-username" class="form-input" required autocomplete="username" placeholder="např. admin">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Heslo</label>
+          <input type="password" id="input-password" class="form-input" required autocomplete="current-password" placeholder="••••••••">
+        </div>
+
+        <div id="settings-group" style="display: none;" class="form-group">
+          <label class="form-label">Adresa PLC (Backend)</label>
+          <input type="text" id="input-backend" class="form-input" value="" placeholder="např. http://192.168.0.122">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">Při provozu přes lokální proxy ponechte prázdné.</span>
+        </div>
+
+        <button type="submit" id="btn-login" class="btn-primary">Přihlásit se</button>
+        <span class="settings-toggle" onclick="toggleSettings()">Změnit adresu backendu</span>
+      </form>
+    </div>
+
+    <!-- MAIN DASHBOARD VIEW -->
+    <div id="view-dashboard" style="display: none;">
+      
+      <header>
+        <div class="logo-area">
+          <div class="logo-badge">🔥</div>
+          <div class="logo-title">
+            <h1>Regulace vytápění</h1>
+            <p id="label-user">Přihlášen: admin</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-secondary" onclick="fetchData()">🔄 Obnovit</button>
+          <button class="btn-secondary" onclick="handleLogout()">Odhlásit</button>
+        </div>
+      </header>
+
+      <!-- CARD 1: TOPNÁ VODA -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>♨️</span>
+            <span id="title-heat">Topný okruh</span>
+          </div>
+          <span class="badge badge-heat" id="status-heat">Aktivní</span>
+        </div>
+
+        <div class="temp-grid">
+          <div class="temp-block">
+            <div class="temp-label">Aktuální teplota vody</div>
+            <div class="temp-value heat">
+              <span id="val-heat-act">--</span><span class="temp-unit">°C</span>
+            </div>
+          </div>
+          <div class="temp-block">
+            <div class="temp-label">Požadovaná teplota (Cíl)</div>
+            <div class="temp-value req">
+              <span id="val-heat-req">--</span><span class="temp-unit">°C</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="temp-block" style="background: rgba(30, 41, 59, 0.4);">
+          <div class="temp-label">Nastavit cílovou teplotu natápění</div>
+          <div class="stepper">
+            <button class="btn-step" onclick="adjustHeatTemp(-0.5)">−</button>
+            <div class="stepper-val" id="stepper-heat-val">-- °C</div>
+            <button class="btn-step" onclick="adjustHeatTemp(0.5)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: TEPLÁ UŽITKOVÁ VODA (TUV) -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>💧</span>
+            <span id="title-tuv">Ohřev TUV</span>
+          </div>
+          <span class="badge badge-water" id="status-tuv">TUV</span>
+        </div>
+
+        <div class="temp-grid">
+          <div class="temp-block">
+            <div class="temp-label">Aktuální teplota TUV</div>
+            <div class="temp-value water">
+              <span id="val-tuv-act">--</span><span class="temp-unit">°C</span>
+            </div>
+          </div>
+          <div class="temp-block">
+            <div class="temp-label">Požadovaná teplota TUV</div>
+            <div class="temp-value req">
+              <span id="val-tuv-req">--</span><span class="temp-unit">°C</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="temp-block" style="background: rgba(30, 41, 59, 0.4);">
+          <div class="temp-label">Nastavit požadovanou teplotu TUV</div>
+          <div class="stepper">
+            <button class="btn-step" onclick="adjustTuvTemp(-1)">−</button>
+            <div class="stepper-val" id="stepper-tuv-val">-- °C</div>
+            <button class="btn-step" onclick="adjustTuvTemp(1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div>
+          <span class="dot" id="status-dot"></span>
+          <span id="status-text">Připojeno k PLC</span>
+        </div>
+        <div id="status-time">Poslední aktualizace: --:--:--</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="toast" class="toast">Hodnota uložena</div>
+
+  <script>
+    // State
+    let backendUrl = localStorage.getItem('xcc_backend') || '';
+    let currentUser = null;
+    let pollTimer = null;
+    let saveTimeout = null;
+    let components = {};
+
+    let heatComponent = null;
+    let tuvComponent = null;
+
+    let targetHeatTemp = null;
+    let targetTuvTemp = null;
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('input-backend').value = backendUrl;
+      checkAuth();
+    });
+
+    function toggleSettings() {
+      const el = document.getElementById('settings-group');
+      el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function getApiUrl(endpoint) {
+      const base = backendUrl.trim().replace(/\/+$/, '');
+      const ep = endpoint.startsWith('/') ? endpoint : '/' + endpoint;
+      return base ? base + ep : ep;
+    }
+
+    // Auth
+    async function checkAuth() {
+      // Check cookies or cached session
+      const cached = localStorage.getItem('xcclogged');
+      if (cached) {
+        try {
+          currentUser = JSON.parse(cached);
+        } catch (e) {}
+      }
+
+      // Test session with functions.json
+      try {
+        const res = await fetch(getApiUrl('/functions.json?status'), { credentials: 'same-origin' });
+        if (res.ok) {
+          const data = await res.json();
+          processFunctionsData(data);
+          showDashboard();
+          startPolling();
+          return;
+        }
+      } catch (err) {
+        console.warn('Kontrola relace selhala:', err);
+      }
+
+      showLogin();
+    }
+
+    function showLogin() {
+      stopPolling();
+      document.getElementById('view-login').style.display = 'block';
+      document.getElementById('view-dashboard').style.display = 'none';
+    }
+
+    function showDashboard() {
+      document.getElementById('view-login').style.display = 'none';
+      document.getElementById('view-dashboard').style.display = 'block';
+      document.getElementById('label-user').innerText = 'Přihlášen: ' + (currentUser?.login || 'Uživatel');
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const login = document.getElementById('input-username').value.trim();
+      const pass = document.getElementById('input-password').value;
+      const customBackend = document.getElementById('input-backend').value.trim();
+
+      backendUrl = customBackend;
+      localStorage.setItem('xcc_backend', backendUrl);
+
+      const alertEl = document.getElementById('login-alert');
+      const btn = document.getElementById('btn-login');
+      alertEl.style.display = 'none';
+      btn.innerText = 'Ověřování...';
+      btn.disabled = true;
+
+      try {
+        const url = getApiUrl(`/login.json?login=${encodeURIComponent(login)}&pass=${encodeURIComponent(pass)}`);
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8'
+          },
+          credentials: 'same-origin'
+        });
+
+        if (res.ok) {
+          let data = {};
+          try { data = await res.json(); } catch(e) {}
+          currentUser = { login: login, admin: document.cookie.includes('jpar=true') || data.admin };
+          localStorage.setItem('xcclogged', JSON.stringify(currentUser));
+          showDashboard();
+          fetchData();
+          startPolling();
+        } else if (res.status === 401) {
+          alertEl.innerText = 'Neplatné přihlašovací jméno nebo heslo.';
+          alertEl.style.display = 'block';
+        } else {
+          alertEl.innerText = `Chyba serveru (${res.status}). Zkontrolujte adresu backendu.`;
+          alertEl.style.display = 'block';
+        }
+      } catch (err) {
+        alertEl.innerText = 'Nelze se spojit s PLC backendem. Zkontrolujte síť a adresu.';
+        alertEl.style.display = 'block';
+      } finally {
+        btn.innerText = 'Přihlásit se';
+        btn.disabled = false;
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await fetch(getApiUrl('/logout.json'), { credentials: 'same-origin' });
+      } catch (e) {}
+      localStorage.removeItem('xcclogged');
+      currentUser = null;
+      showLogin();
+    }
+
+    // Polling and Data Fetching
+    function startPolling() {
+      stopPolling();
+      pollTimer = setInterval(fetchData, 2500);
+    }
+
+    function stopPolling() {
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+    }
+
+    async function fetchData() {
+      const dot = document.getElementById('status-dot');
+      try {
+        dot.classList.add('busy');
+        const res = await fetch(getApiUrl('/functions.json?status'), { credentials: 'same-origin' });
+        if (res.status === 401) {
+          showLogin();
+          return;
+        }
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        processFunctionsData(data);
+        renderData();
+        document.getElementById('status-text').innerText = 'Připojeno k PLC';
+        document.getElementById('status-time').innerText = 'Aktualizováno: ' + new Date().toLocaleTimeString();
+      } catch (err) {
+        console.error('Chyba načítání dat:', err);
+        document.getElementById('status-text').innerText = 'Chyba spojení s PLC';
+      } finally {
+        dot.classList.remove('busy');
+      }
+    }
+
+    function processFunctionsData(data) {
+      if (Array.isArray(data)) {
+        components = {};
+        for (const item of data) {
+          components[item.id] = item;
+        }
+      } else if (typeof data === 'object') {
+        components = data;
+      }
+
+      // Find TopnyOkruh and Tuv
+      for (const id in components) {
+        const c = components[id];
+        if (c.TYPE === 'xcc.component.TopnyOkruh' && !heatComponent) {
+          heatComponent = c;
+        }
+        if (c.TYPE === 'xcc.component.Tuv' && !tuvComponent) {
+          tuvComponent = c;
+        }
+      }
+
+      // If already assigned, update references
+      if (heatComponent && components[heatComponent.id]) {
+        heatComponent = components[heatComponent.id];
+      }
+      if (tuvComponent && components[tuvComponent.id]) {
+        tuvComponent = components[tuvComponent.id];
+      }
+    }
+
+    function renderData() {
+      // 1. Render Topny Okruh
+      if (heatComponent) {
+        document.getElementById('title-heat').innerText = heatComponent.name || 'Topný okruh';
+        const st = heatComponent.status || {};
+        
+        // Actual temp (actualWater or actTemp)
+        const actTemp = st.actTemp ?? heatComponent.actualWater ?? st.actualWater ?? '--';
+        document.getElementById('val-heat-act').innerText = typeof actTemp === 'number' ? actTemp.toFixed(1) : actTemp;
+
+        // Target temp (reqTemp or requestWater or requestAir)
+        const reqTemp = st.reqTemp ?? heatComponent.requestWater ?? heatComponent.requestAir ?? '--';
+        document.getElementById('val-heat-req').innerText = typeof reqTemp === 'number' ? reqTemp.toFixed(1) : reqTemp;
+
+        if (targetHeatTemp === null && typeof reqTemp === 'number') {
+          targetHeatTemp = reqTemp;
+        }
+        document.getElementById('stepper-heat-val').innerText = (targetHeatTemp !== null ? targetHeatTemp.toFixed(1) : '--') + ' °C';
+
+        // State indicator
+        if (st.on === false) {
+          document.getElementById('status-heat').innerText = 'Vypnuto';
+          document.getElementById('status-heat').style.borderColor = 'var(--text-muted)';
+        } else {
+          document.getElementById('status-heat').innerText = st.operationMode === 'COOL' ? 'Chlazení' : 'Natápění';
+        }
+      }
+
+      // 2. Render TUV
+      if (tuvComponent) {
+        document.getElementById('title-tuv').innerText = tuvComponent.name || 'Ohřev TUV';
+        const st = tuvComponent.status || {};
+
+        // Actual TUV
+        const actTuv = st.actTemp ?? tuvComponent.actualTuv ?? st.actualTuv ?? '--';
+        document.getElementById('val-tuv-act').innerText = typeof actTuv === 'number' ? actTuv.toFixed(1) : actTuv;
+
+        // Req TUV (reqTemp or minTuv)
+        const reqTuv = st.reqTemp ?? tuvComponent.minTuv ?? '--';
+        document.getElementById('val-tuv-req').innerText = typeof reqTuv === 'number' ? reqTuv.toFixed(1) : reqTuv;
+
+        if (targetTuvTemp === null && typeof reqTuv === 'number') {
+          targetTuvTemp = reqTuv;
+        }
+        document.getElementById('stepper-tuv-val').innerText = (targetTuvTemp !== null ? targetTuvTemp.toFixed(1) : '--') + ' °C';
+
+        document.getElementById('status-tuv').innerText = st.on === false ? 'Vypnuto' : 'Aktivní';
+      }
+    }
+
+    // Adjust Temperature and Save
+    function adjustHeatTemp(delta) {
+      if (targetHeatTemp === null) targetHeatTemp = 21.0;
+      targetHeatTemp = +(targetHeatTemp + delta).toFixed(1);
+      document.getElementById('stepper-heat-val').innerText = targetHeatTemp.toFixed(1) + ' °C';
+      queueSaveHeat();
+    }
+
+    function adjustTuvTemp(delta) {
+      if (targetTuvTemp === null) targetTuvTemp = 50.0;
+      targetTuvTemp = +(targetTuvTemp + delta).toFixed(1);
+      document.getElementById('stepper-tuv-val').innerText = targetTuvTemp.toFixed(1) + ' °C';
+      queueSaveTuv();
+    }
+
+    function queueSaveHeat() {
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(async () => {
+        if (!heatComponent) return;
+        const reqProp = heatComponent.status?.reqProp || 'requestAir';
+        const payload = [{
+          id: heatComponent.id,
+          propPath: [reqProp],
+          value: targetHeatTemp
+        }];
+        await sendSave(payload, `Požadovaná teplota topení nastavena na ${targetHeatTemp} °C`);
+      }, 600);
+    }
+
+    function queueSaveTuv() {
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(async () => {
+        if (!tuvComponent) return;
+        const reqProp = tuvComponent.status?.reqProp || 'minTuv';
+        const payload = [{
+          id: tuvComponent.id,
+          propPath: [reqProp],
+          value: targetTuvTemp
+        }];
+        await sendSave(payload, `Požadovaná teplota TUV nastavena na ${targetTuvTemp} °C`);
+      }, 600);
+    }
+
+    async function sendSave(payload, successMsg) {
+      try {
+        const res = await fetch(getApiUrl('/saveData.json'), {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8'
+          },
+          body: JSON.stringify(payload),
+          credentials: 'same-origin'
+        });
+        if (res.ok) {
+          showToast(successMsg);
+          setTimeout(fetchData, 300);
+        } else {
+          showToast('Chyba při ukládání: HTTP ' + res.status);
+        }
+      } catch (err) {
+        showToast('Nelze odeslat změnu na PLC');
+      }
+    }
+  </script>
+</body>
+</html>
