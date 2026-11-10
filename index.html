@@ -15,6 +15,8 @@
       --primary-hover: #0ea5e9;
       --heat: #f97316;
       --water: #06b6d4;
+      --outdoor: #a855f7;
+      --unit: #10b981;
       --success: #22c55e;
       --danger: #ef4444;
       --radius: 16px;
@@ -48,7 +50,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       padding: 8px 0;
     }
 
@@ -59,17 +61,17 @@
     }
 
     .logo-badge {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       background: linear-gradient(135deg, var(--heat), var(--primary));
-      border-radius: 12px;
+      border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 22px;
       font-weight: bold;
       color: #fff;
-      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+      box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35);
     }
 
     .logo-title h1 {
@@ -78,22 +80,39 @@
       letter-spacing: -0.02em;
     }
 
-    .logo-title p {
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       font-size: 0.8rem;
       color: var(--text-muted);
+    }
+
+    .weather-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #d8b4fe;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-left: 8px;
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .btn-secondary {
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--card-border);
       color: var(--text);
-      padding: 8px 14px;
+      padding: 8px 12px;
       border-radius: 10px;
       font-size: 0.85rem;
       font-weight: 500;
@@ -110,7 +129,7 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 20px;
+      padding: 18px;
       margin-bottom: 16px;
       backdrop-filter: blur(12px);
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
@@ -120,7 +139,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .card-title {
@@ -133,47 +152,70 @@
 
     .badge {
       font-size: 0.75rem;
-      padding: 4px 8px;
+      padding: 4px 9px;
       border-radius: 20px;
       font-weight: 600;
     }
 
     .badge-heat { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }
     .badge-water { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
-    .badge-online { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .badge-unit { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-outdoor { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
 
-    /* Temperature Display Grid */
+    /* Grid Layouts */
     .temp-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: 12px;
+      margin-bottom: 14px;
     }
 
-    @media (max-width: 480px) {
-      .temp-grid {
-        grid-template-columns: 1fr;
-      }
+    .stats-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stats-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 540px) {
+      .temp-grid { grid-template-columns: 1fr; }
+      .stats-grid-3 { grid-template-columns: 1fr; }
+      .stats-grid-4 { grid-template-columns: repeat(2, 1fr); }
     }
 
     .temp-block {
-      background: rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.65);
       border: 1px solid rgba(255, 255, 255, 0.04);
       border-radius: 12px;
-      padding: 16px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-mini-block {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      padding: 10px 8px;
       text-align: center;
     }
 
     .temp-label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--text-muted);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .temp-value {
-      font-size: 2.4rem;
+      font-size: 2.2rem;
       font-weight: 800;
       letter-spacing: -0.03em;
       color: #fff;
@@ -181,13 +223,34 @@
 
     .temp-value.heat { color: #fdba74; }
     .temp-value.water { color: #67e8f9; }
+    .temp-value.outdoor { color: #d8b4fe; }
+    .temp-value.unit { color: #6ee7b7; }
     .temp-value.req { color: #f8fafc; }
 
+    .stat-val-medium {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-val-small {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
     .temp-unit {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 500;
       color: var(--text-muted);
       margin-left: 2px;
+    }
+
+    .sub-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
     /* Stepper Controls */
@@ -196,7 +259,7 @@
       align-items: center;
       justify-content: center;
       gap: 14px;
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     .btn-step {
@@ -222,7 +285,7 @@
     }
 
     .stepper-val {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 700;
       min-width: 80px;
       text-align: center;
@@ -236,9 +299,9 @@
       font-size: 0.78rem;
       color: var(--text-muted);
       padding: 12px 16px;
-      background: rgba(15, 23, 42, 0.4);
+      background: rgba(15, 23, 42, 0.45);
       border-radius: 12px;
-      margin-top: 8px;
+      margin-top: 4px;
     }
 
     .dot {
@@ -388,7 +451,7 @@
     <div id="view-login" class="login-box card" style="display: none;">
       <div class="login-icon">🔥</div>
       <h2 class="login-title">xcc Regulace</h2>
-      <p class="login-subtitle">Přihlaste se pro ovládání topení a TUV</p>
+      <p class="login-subtitle">Přihlaste se pro ovládání tepelného čerpadla</p>
 
       <div id="login-alert" class="alert alert-danger"></div>
 
@@ -421,7 +484,10 @@
           <div class="logo-badge">🔥</div>
           <div class="logo-title">
             <h1>Regulace vytápění</h1>
-            <p id="label-user">Přihlášen: admin</p>
+            <div class="user-pill">
+              <span id="label-user">Přihlášen: admin</span>
+              <span id="pill-weather" class="weather-pill" style="display: none;">🌤️ <span id="val-outdoor-pill">--</span>°C</span>
+            </div>
           </div>
         </div>
         <div class="header-actions">
@@ -430,7 +496,83 @@
         </div>
       </header>
 
-      <!-- CARD 1: TOPNÁ VODA -->
+      <!-- CARD 1: VENKOVNÍ TEPLOTA -->
+      <div class="card" id="card-outdoor">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🌤️</span>
+            <span>Venkovní teplota</span>
+          </div>
+          <span class="badge badge-outdoor">Exteriér</span>
+        </div>
+        <div class="temp-block">
+          <div class="temp-label">Aktuální teplota venku</div>
+          <div class="temp-value outdoor">
+            <span id="val-outdoor-act">--</span><span class="temp-unit">°C</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: TEPELNÉ ČERPADLO (PROVOZNÍ HODNOTY: OTÁČKY, PROUD, VÝKON) -->
+      <div class="card" id="card-unit">
+        <div class="card-header">
+          <div class="card-title">
+            <span>⚙️</span>
+            <span id="title-unit">Tepelné čerpadlo (TČ)</span>
+          </div>
+          <span class="badge badge-unit" id="status-unit">Provoz</span>
+        </div>
+
+        <!-- HLAVNÍ METRIKY: OTÁČKY, PROUD, VÝKON -->
+        <div class="stats-grid-3">
+          <div class="temp-block">
+            <div class="temp-label">Otáčky ventilátoru</div>
+            <div class="stat-val-medium unit">
+              <span id="val-unit-rpm">--</span> <span class="temp-unit" style="font-size: 0.9rem;">ot/min</span>
+            </div>
+            <div class="sub-note" id="val-unit-rpm-detail">Horní / Dolní</div>
+          </div>
+
+          <div class="temp-block">
+            <div class="temp-label">Odebíraný proud</div>
+            <div class="stat-val-medium" style="color: #38bdf8;">
+              <span id="val-unit-curr">--</span> <span class="temp-unit" style="font-size: 0.9rem;">A</span>
+            </div>
+            <div class="sub-note">Proud kompresoru</div>
+          </div>
+
+          <div class="temp-block">
+            <div class="temp-label">Aktuální výkon</div>
+            <div class="stat-val-medium" style="color: #fbbf24;">
+              <span id="val-unit-power">--</span> <span class="temp-unit" id="val-unit-power-unit" style="font-size: 0.9rem;">%</span>
+            </div>
+            <div class="sub-note">Vytížení jednotky</div>
+          </div>
+        </div>
+
+        <!-- DIAGNOSTICKÉ TEPLOTY CHLADICÍHO OKRUHU -->
+        <div class="temp-label" style="text-align: left; margin: 12px 0 6px 4px;">Teploty chladicího okruhu jednotky:</div>
+        <div class="stats-grid-4">
+          <div class="stat-mini-block">
+            <div class="temp-label">Sání (ts)</div>
+            <div class="stat-val-small"><span id="val-unit-ts">--</span>°C</div>
+          </div>
+          <div class="stat-mini-block">
+            <div class="temp-label">Výtlak (td)</div>
+            <div class="stat-val-small"><span id="val-unit-td">--</span>°C</div>
+          </div>
+          <div class="stat-mini-block">
+            <div class="temp-label">Výparník (te)</div>
+            <div class="stat-val-small"><span id="val-unit-te">--</span>°C</div>
+          </div>
+          <div class="stat-mini-block">
+            <div class="temp-label">Kondenzát (tcj)</div>
+            <div class="stat-val-small"><span id="val-unit-tcj">--</span>°C</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3: TOPNÁ VODA -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
@@ -465,7 +607,7 @@
         </div>
       </div>
 
-      <!-- CARD 2: TEPLÁ UŽITKOVÁ VODA (TUV) -->
+      <!-- CARD 4: TEPLÁ UŽITKOVÁ VODA (TUV) -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
@@ -522,9 +664,12 @@
     let pollTimer = null;
     let saveTimeout = null;
     let components = {};
+    let globalObj = null;
 
     let heatComponent = null;
     let tuvComponent = null;
+    let tempOutComponent = null;
+    let inverterComponent = null;
 
     let targetHeatTemp = null;
     let targetTuvTemp = null;
@@ -555,7 +700,6 @@
 
     // Auth
     async function checkAuth() {
-      // Check cookies or cached session
       const cached = localStorage.getItem('xcclogged');
       if (cached) {
         try {
@@ -563,13 +707,13 @@
         } catch (e) {}
       }
 
-      // Test session with functions.json
       try {
-        const res = await fetch(getApiUrl('/functions.json?status'), { credentials: 'same-origin' });
+        const res = await fetch(getApiUrl('/functions.json?status&extended'), { credentials: 'same-origin' });
         if (res.ok) {
           const data = await res.json();
           processFunctionsData(data);
           showDashboard();
+          fetchDetailedData();
           startPolling();
           return;
         }
@@ -668,7 +812,7 @@
       const dot = document.getElementById('status-dot');
       try {
         dot.classList.add('busy');
-        const res = await fetch(getApiUrl('/functions.json?status'), { credentials: 'same-origin' });
+        const res = await fetch(getApiUrl('/functions.json?status&extended'), { credentials: 'same-origin' });
         if (res.status === 401) {
           showLogin();
           return;
@@ -677,6 +821,10 @@
         const data = await res.json();
         processFunctionsData(data);
         renderData();
+
+        // Also query getData.json for live units & tempOut projection
+        await fetchDetailedData();
+
         document.getElementById('status-text').innerText = 'Připojeno k PLC';
         document.getElementById('status-time').innerText = 'Aktualizováno: ' + new Date().toLocaleTimeString();
       } catch (err) {
@@ -684,6 +832,43 @@
         document.getElementById('status-text').innerText = 'Chyba spojení s PLC';
       } finally {
         dot.classList.remove('busy');
+      }
+    }
+
+    // Secondary fetch to ensure deep unit metrics and tempOut are always populated
+    async function fetchDetailedData() {
+      const gid = globalObj?.idGlobal || 'null';
+      const mask = {
+        [gid]: {
+          tempOut: 1,
+          units: [{ fanUp: 1, fanLo: 1, curr: 1, power: 1, tcj: 1, ts: 1, td: 1, te: 1 }]
+        }
+      };
+
+      try {
+        const res = await fetch(getApiUrl('/getData.json?status&extended'), {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json; charset=utf-8'
+          },
+          body: JSON.stringify(mask),
+          credentials: 'same-origin'
+        });
+
+        if (res.ok) {
+          const detailed = await res.json();
+          const target = detailed[gid] || detailed['null'];
+          if (target) {
+            if (target.tempOut !== undefined && globalObj) globalObj.tempOut = target.tempOut;
+            if (target.units && globalObj) {
+              globalObj.units = target.units;
+            }
+            renderUnitData();
+          }
+        }
+      } catch (e) {
+        // Silent catch for secondary detail poll
       }
     }
 
@@ -697,24 +882,21 @@
         components = data;
       }
 
-      // Find TopnyOkruh and Tuv
+      globalObj = components['null'] || components['Global'] || globalObj || {};
+
+      // Find specialized components
       for (const id in components) {
         const c = components[id];
-        if (c.TYPE === 'xcc.component.TopnyOkruh' && !heatComponent) {
-          heatComponent = c;
-        }
-        if (c.TYPE === 'xcc.component.Tuv' && !tuvComponent) {
-          tuvComponent = c;
-        }
+        if (c.TYPE === 'xcc.component.TopnyOkruh' && !heatComponent) heatComponent = c;
+        if (c.TYPE === 'xcc.component.Tuv' && !tuvComponent) tuvComponent = c;
+        if (c.TYPE === 'xcc.component.TempOut' && !tempOutComponent) tempOutComponent = c;
+        if (c.TYPE === 'xcc.component.Inverter' && !inverterComponent) inverterComponent = c;
       }
 
-      // If already assigned, update references
-      if (heatComponent && components[heatComponent.id]) {
-        heatComponent = components[heatComponent.id];
-      }
-      if (tuvComponent && components[tuvComponent.id]) {
-        tuvComponent = components[tuvComponent.id];
-      }
+      if (heatComponent && components[heatComponent.id]) heatComponent = components[heatComponent.id];
+      if (tuvComponent && components[tuvComponent.id]) tuvComponent = components[tuvComponent.id];
+      if (tempOutComponent && components[tempOutComponent.id]) tempOutComponent = components[tempOutComponent.id];
+      if (inverterComponent && components[inverterComponent.id]) inverterComponent = components[inverterComponent.id];
     }
 
     function renderData() {
@@ -723,11 +905,9 @@
         document.getElementById('title-heat').innerText = heatComponent.name || 'Topný okruh';
         const st = heatComponent.status || {};
         
-        // Actual temp (actualWater or actTemp)
         const actTemp = st.actTemp ?? heatComponent.actualWater ?? st.actualWater ?? '--';
         document.getElementById('val-heat-act').innerText = typeof actTemp === 'number' ? actTemp.toFixed(1) : actTemp;
 
-        // Target temp (reqTemp or requestWater or requestAir)
         const reqTemp = st.reqTemp ?? heatComponent.requestWater ?? heatComponent.requestAir ?? '--';
         document.getElementById('val-heat-req').innerText = typeof reqTemp === 'number' ? reqTemp.toFixed(1) : reqTemp;
 
@@ -736,7 +916,6 @@
         }
         document.getElementById('stepper-heat-val').innerText = (targetHeatTemp !== null ? targetHeatTemp.toFixed(1) : '--') + ' °C';
 
-        // State indicator
         if (st.on === false) {
           document.getElementById('status-heat').innerText = 'Vypnuto';
           document.getElementById('status-heat').style.borderColor = 'var(--text-muted)';
@@ -750,11 +929,9 @@
         document.getElementById('title-tuv').innerText = tuvComponent.name || 'Ohřev TUV';
         const st = tuvComponent.status || {};
 
-        // Actual TUV
         const actTuv = st.actTemp ?? tuvComponent.actualTuv ?? st.actualTuv ?? '--';
         document.getElementById('val-tuv-act').innerText = typeof actTuv === 'number' ? actTuv.toFixed(1) : actTuv;
 
-        // Req TUV (reqTemp or minTuv)
         const reqTuv = st.reqTemp ?? tuvComponent.minTuv ?? '--';
         document.getElementById('val-tuv-req').innerText = typeof reqTuv === 'number' ? reqTuv.toFixed(1) : reqTuv;
 
@@ -765,6 +942,68 @@
 
         document.getElementById('status-tuv').innerText = st.on === false ? 'Vypnuto' : 'Aktivní';
       }
+
+      // 3. Render Outdoor Temperature and Unit Metrics
+      renderUnitData();
+    }
+
+    function renderUnitData() {
+      // A. Venkovní teplota (Outdoor Temperature)
+      let outdoorVal = null;
+      if (globalObj && globalObj.tempOut !== undefined && globalObj.tempOut !== null) {
+        outdoorVal = globalObj.tempOut;
+      } else if (tempOutComponent) {
+        outdoorVal = tempOutComponent.status?.actTemp ?? tempOutComponent.actTemp;
+      }
+
+      if (outdoorVal !== null && outdoorVal !== undefined) {
+        const formatted = typeof outdoorVal === 'number' ? outdoorVal.toFixed(1) : outdoorVal;
+        document.getElementById('val-outdoor-act').innerText = formatted;
+        document.getElementById('val-outdoor-pill').innerText = formatted;
+        document.getElementById('pill-weather').style.display = 'inline-flex';
+      }
+
+      // B. Jednotka TČ (Otáčky, Proud, Výkon, Teploty chlazení)
+      const units = globalObj?.units || [];
+      const u = units.length > 0 ? units[0] : null;
+
+      if (u) {
+        // Otáčky ventilátoru
+        const fanUp = u.fanUp ?? '--';
+        const fanLo = u.fanLo ?? '--';
+        const rpmDisplay = typeof fanUp === 'number' ? fanUp : (typeof fanLo === 'number' ? fanLo : '--');
+        document.getElementById('val-unit-rpm').innerText = rpmDisplay;
+        if (typeof fanUp === 'number' && typeof fanLo === 'number') {
+          document.getElementById('val-unit-rpm-detail').innerText = `Horní: ${fanUp} / Dolní: ${fanLo} ot/min`;
+        }
+
+        // Proud
+        const curr = u.curr !== undefined && u.curr !== null ? (typeof u.curr === 'number' ? u.curr.toFixed(1) : u.curr) : '--';
+        document.getElementById('val-unit-curr').innerText = curr;
+
+        // Výkon
+        let powerVal = u.power;
+        let powerUnit = '%';
+        if (powerVal === undefined || powerVal === null) {
+          if (inverterComponent?.powerFve !== undefined) {
+            powerVal = inverterComponent.powerFve;
+            powerUnit = 'W';
+          }
+        }
+        document.getElementById('val-unit-power').innerText = powerVal !== undefined && powerVal !== null ? (typeof powerVal === 'number' ? Math.round(powerVal) : powerVal) : '--';
+        document.getElementById('val-unit-power-unit').innerText = powerUnit;
+
+        // Teploty okruhu (ts, td, te, tcj)
+        document.getElementById('val-unit-ts').innerText = formatTemp(u.ts);
+        document.getElementById('val-unit-td').innerText = formatTemp(u.td);
+        document.getElementById('val-unit-te').innerText = formatTemp(u.te);
+        document.getElementById('val-unit-tcj').innerText = formatTemp(u.tcj);
+      }
+    }
+
+    function formatTemp(val) {
+      if (val === undefined || val === null) return '--';
+      return typeof val === 'number' ? val.toFixed(1) : val;
     }
 
     // Adjust Temperature and Save
