@@ -669,7 +669,7 @@
 
         <!-- VÝKON JEDNOTKY V PROCENTECH A TEPLOTY CHLAZENÍ -->
         <div class="temp-label" style="text-align: left; margin: 12px 0 6px 4px;">Výkon v procentech a teploty chlazení:</div>
-        <div class="stats-grid-4">
+        <div class="stats-grid-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;">
           <div class="stat-mini-block" style="border-color: rgba(251, 191, 36, 0.3);">
             <div class="temp-label" style="color: #fbbf24;">Výkon jednotky</div>
             <div class="stat-val-small" style="color: #fde047;"><span id="val-unit-power">--</span>%</div>
@@ -685,6 +685,10 @@
           <div class="stat-mini-block">
             <div class="temp-label">Výparník (te)</div>
             <div class="stat-val-small"><span id="val-unit-te">--</span>°C</div>
+          </div>
+          <div class="stat-mini-block">
+            <div class="temp-label">Kondenzát (tcj)</div>
+            <div class="stat-val-small"><span id="val-unit-tcj">--</span>°C</div>
           </div>
         </div>
       </div>
@@ -1127,49 +1131,60 @@
     function renderData() {
       // 1. Topný okruh
       if (heatComponent) {
-        document.getElementById('title-heat').innerText = heatComponent.name || 'Topný okruh';
+        setElText('title-heat', heatComponent.name || 'Topný okruh');
         const st = heatComponent.status || {};
         
         const actTemp = st.actTemp ?? heatComponent.actualWater ?? st.actualWater ?? '--';
-        document.getElementById('val-heat-act').innerText = typeof actTemp === 'number' ? actTemp.toFixed(1) : actTemp;
+        setElText('val-heat-act', typeof actTemp === 'number' ? actTemp.toFixed(1) : actTemp);
 
         const reqTemp = st.reqTemp ?? heatComponent.requestWater ?? heatComponent.requestAir ?? '--';
-        document.getElementById('val-heat-req').innerText = typeof reqTemp === 'number' ? reqTemp.toFixed(1) : reqTemp;
+        setElText('val-heat-req', typeof reqTemp === 'number' ? reqTemp.toFixed(1) : reqTemp);
 
         if (targetHeatTemp === null && typeof reqTemp === 'number') {
           targetHeatTemp = reqTemp;
         }
-        document.getElementById('stepper-heat-val').innerText = (targetHeatTemp !== null ? targetHeatTemp.toFixed(1) : '--') + ' °C';
+        setElText('stepper-heat-val', (targetHeatTemp !== null ? targetHeatTemp.toFixed(1) : '--') + ' °C');
 
-        if (st.on === false) {
-          document.getElementById('status-heat').innerText = 'Vypnuto';
-          document.getElementById('status-heat').style.borderColor = 'var(--text-muted)';
-        } else {
-          document.getElementById('status-heat').innerText = st.operationMode === 'COOL' ? 'Chlazení' : 'Natápění';
+        const statusHeatEl = document.getElementById('status-heat');
+        if (statusHeatEl) {
+          if (st.on === false) {
+            statusHeatEl.innerText = 'Vypnuto';
+            statusHeatEl.style.borderColor = 'var(--text-muted)';
+          } else {
+            statusHeatEl.innerText = st.operationMode === 'COOL' ? 'Chlazení' : 'Natápění';
+          }
         }
       }
 
       // 2. TUV
       if (tuvComponent) {
-        document.getElementById('title-tuv').innerText = tuvComponent.name || 'Ohřev TUV';
+        setElText('title-tuv', tuvComponent.name || 'Ohřev TUV');
         const st = tuvComponent.status || {};
 
         const actTuv = st.actTemp ?? tuvComponent.actualTuv ?? st.actualTuv ?? '--';
-        document.getElementById('val-tuv-act').innerText = typeof actTuv === 'number' ? actTuv.toFixed(1) : actTuv;
+        setElText('val-tuv-act', typeof actTuv === 'number' ? actTuv.toFixed(1) : actTuv);
 
         const reqTuv = st.reqTemp ?? tuvComponent.minTuv ?? '--';
-        document.getElementById('val-tuv-req').innerText = typeof reqTuv === 'number' ? reqTuv.toFixed(1) : reqTuv;
+        setElText('val-tuv-req', typeof reqTuv === 'number' ? reqTuv.toFixed(1) : reqTuv);
 
         if (targetTuvTemp === null && typeof reqTuv === 'number') {
           targetTuvTemp = reqTuv;
         }
-        document.getElementById('stepper-tuv-val').innerText = (targetTuvTemp !== null ? targetTuvTemp.toFixed(1) : '--') + ' °C';
+        setElText('stepper-tuv-val', (targetTuvTemp !== null ? targetTuvTemp.toFixed(1) : '--') + ' °C');
 
-        document.getElementById('status-tuv').innerText = st.on === false ? 'Vypnuto' : 'Aktivní';
+        const statusTuvEl = document.getElementById('status-tuv');
+        if (statusTuvEl) {
+          statusTuvEl.innerText = st.on === false ? 'Vypnuto' : 'Aktivní';
+        }
       }
 
       // 3. Jednotka TČ a venkovní teplota
       renderUnitData();
+    }
+
+    function setElText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.innerText = text;
     }
 
     function renderUnitData() {
@@ -1183,9 +1198,10 @@
 
       if (outdoorVal !== null && outdoorVal !== undefined) {
         const formatted = typeof outdoorVal === 'number' ? outdoorVal.toFixed(1) : outdoorVal;
-        document.getElementById('val-outdoor-act').innerText = formatted;
-        document.getElementById('val-outdoor-pill').innerText = formatted;
-        document.getElementById('pill-weather').style.display = 'inline-flex';
+        setElText('val-outdoor-act', formatted);
+        setElText('val-outdoor-pill', formatted);
+        const pill = document.getElementById('pill-weather');
+        if (pill) pill.style.display = 'inline-flex';
       }
 
       // B. Jednotka TČ
@@ -1197,36 +1213,36 @@
         const fanLo = u.fanLo ?? '--';
         const fanUp = u.fanUp ?? '--';
         const rpmDisplay = typeof fanLo === 'number' ? fanLo : (typeof fanUp === 'number' ? fanUp : '--');
-        document.getElementById('val-unit-rpm').innerText = rpmDisplay;
+        setElText('val-unit-rpm', rpmDisplay);
         if (typeof fanUp === 'number') {
-          document.getElementById('val-unit-rpm-detail').innerText = `Horní: ${fanUp} ot/min`;
+          setElText('val-unit-rpm-detail', `Horní: ${fanUp} ot/min`);
         } else {
-          document.getElementById('val-unit-rpm-detail').innerText = `Dolní ventilátor`;
+          setElText('val-unit-rpm-detail', `Dolní ventilátor`);
         }
 
         // Proud
         const curr = u.curr !== undefined && u.curr !== null ? (typeof u.curr === 'number' ? u.curr.toFixed(1) : u.curr) : '--';
-        document.getElementById('val-unit-curr').innerText = curr;
+        setElText('val-unit-curr', curr);
 
         // Vypočtený 3-fázový činný výkon P = sqrt(3) * 400V * I * cos(phi)
         // Předpoklad pro kompresor: 400 V, cos phi = 0.85
         // P = 1.732 * 400 * I * 0.85 = 588.9 * I (W) = 0.589 * I (kW)
         if (typeof u.curr === 'number') {
           const powerKw = (Math.sqrt(3) * 400 * u.curr * 0.85) / 1000.0;
-          document.getElementById('val-unit-power-kw').innerText = powerKw.toFixed(2);
+          setElText('val-unit-power-kw', powerKw.toFixed(2));
         } else {
-          document.getElementById('val-unit-power-kw').innerText = '--';
+          setElText('val-unit-power-kw', '--');
         }
 
         // Výkon v procentech
         const powerPct = u.power !== undefined && u.power !== null ? (typeof u.power === 'number' ? Math.round(u.power) : u.power) : '--';
-        document.getElementById('val-unit-power').innerText = powerPct;
+        setElText('val-unit-power', powerPct);
 
         // Teploty chlazení
-        document.getElementById('val-unit-ts').innerText = formatTemp(u.ts);
-        document.getElementById('val-unit-td').innerText = formatTemp(u.td);
-        document.getElementById('val-unit-te').innerText = formatTemp(u.te);
-        document.getElementById('val-unit-tcj').innerText = formatTemp(u.tcj);
+        setElText('val-unit-ts', formatTemp(u.ts));
+        setElText('val-unit-td', formatTemp(u.td));
+        setElText('val-unit-te', formatTemp(u.te));
+        setElText('val-unit-tcj', formatTemp(u.tcj));
       }
     }
 
