@@ -8,7 +8,8 @@ This repository is configured for collaboration between human developers and AI 
 - **Project Name:** `xcc2`
 - **Description:** Modern frontend application for the `xcc` industrial PLC heating / heat pump controller.
 - **Backend Target:** `http://192.168.0.122`
-- **Detailed Technical Specification:** Refer to [`TECH_SPEC.md`](file:///Users/dandy/workspace/xcc2/TECH_SPEC.md) for full API contracts, all 22 endpoints, data masking engine, and architecture details.
+- **Technical Specification:** Located in [`TECH_SPEC.md`](file:///Users/dandy/workspace/xcc2/TECH_SPEC.md) (contains full API contracts, all 22 endpoints, data masking engine, data polling lifecycle, and architecture details).
+- **Legacy Application:** Located in [`old/`](file:///Users/dandy/workspace/xcc2/old/) (specifically [`old/static/main.js`](file:///Users/dandy/workspace/xcc2/old/static/main.js) – original production React bundle extracted from the PLC controller used for reference and reverse engineering).
 - **Recommended Tech Stack:** React 19 + TypeScript + Vite + Tailwind CSS / shadcn/ui + TanStack Query.
 
 ---
