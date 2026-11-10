@@ -6,8 +6,10 @@ This repository is configured for collaboration between human developers and AI 
 
 ## 1. Project Overview
 - **Project Name:** `xcc2`
-- **Description:** [TBD: Describe project purpose and scope]
-- **Tech Stack:** [TBD: Define primary languages, frameworks, and runtime]
+- **Description:** Modern frontend application for the `xcc` industrial PLC heating / heat pump controller.
+- **Backend Target:** `http://192.168.0.122`
+- **Detailed Technical Specification:** Refer to [`TECH_SPEC.md`](file:///Users/dandy/workspace/xcc2/TECH_SPEC.md) for full API contracts, all 22 endpoints, data masking engine, and architecture details.
+- **Recommended Tech Stack:** React 19 + TypeScript + Vite + Tailwind CSS / shadcn/ui + TanStack Query.
 
 ---
 
