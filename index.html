@@ -526,11 +526,11 @@
         <!-- HLAVNÍ METRIKY: OTÁČKY, PROUD, VÝKON -->
         <div class="stats-grid-3">
           <div class="temp-block">
-            <div class="temp-label">Otáčky ventilátoru</div>
+            <div class="temp-label">Otáčky ventilátoru (dolní)</div>
             <div class="stat-val-medium unit">
               <span id="val-unit-rpm">--</span> <span class="temp-unit" style="font-size: 0.9rem;">ot/min</span>
             </div>
-            <div class="sub-note" id="val-unit-rpm-detail">Horní / Dolní</div>
+            <div class="sub-note" id="val-unit-rpm-detail">Horní: -- ot/min</div>
           </div>
 
           <div class="temp-block">
@@ -968,13 +968,15 @@
       const u = units.length > 0 ? units[0] : null;
 
       if (u) {
-        // Otáčky ventilátoru
-        const fanUp = u.fanUp ?? '--';
+        // Otáčky ventilátoru (hlavní jsou dolní otáčky: fanLo)
         const fanLo = u.fanLo ?? '--';
-        const rpmDisplay = typeof fanUp === 'number' ? fanUp : (typeof fanLo === 'number' ? fanLo : '--');
+        const fanUp = u.fanUp ?? '--';
+        const rpmDisplay = typeof fanLo === 'number' ? fanLo : (typeof fanUp === 'number' ? fanUp : '--');
         document.getElementById('val-unit-rpm').innerText = rpmDisplay;
-        if (typeof fanUp === 'number' && typeof fanLo === 'number') {
-          document.getElementById('val-unit-rpm-detail').innerText = `Horní: ${fanUp} / Dolní: ${fanLo} ot/min`;
+        if (typeof fanUp === 'number') {
+          document.getElementById('val-unit-rpm-detail').innerText = `Horní: ${fanUp} ot/min`;
+        } else {
+          document.getElementById('val-unit-rpm-detail').innerText = `Dolní ventilátor`;
         }
 
         // Proud
