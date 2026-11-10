@@ -17,6 +17,7 @@
       --water: #06b6d4;
       --outdoor: #a855f7;
       --unit: #10b981;
+      --power: #fbbf24;
       --success: #22c55e;
       --danger: #ef4444;
       --radius: 16px;
@@ -42,7 +43,7 @@
 
     .container {
       width: 100%;
-      max-width: 680px;
+      max-width: 720px;
     }
 
     /* Header & Navigation */
@@ -161,6 +162,7 @@
     .badge-water { background: rgba(6, 182, 212, 0.2); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
     .badge-unit { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
     .badge-outdoor { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .badge-power { background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.4); }
 
     /* Grid Layouts */
     .temp-grid {
@@ -184,7 +186,7 @@
       margin-top: 10px;
     }
 
-    @media (max-width: 540px) {
+    @media (max-width: 580px) {
       .temp-grid { grid-template-columns: 1fr; }
       .stats-grid-3 { grid-template-columns: 1fr; }
       .stats-grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -288,6 +290,121 @@
       font-size: 1.45rem;
       font-weight: 700;
       min-width: 80px;
+      text-align: center;
+    }
+
+    /* Charts UI Elements */
+    .chart-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 10px;
+    }
+
+    .chart-tab {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .chart-tab:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .chart-tab.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--primary);
+      color: #38bdf8;
+    }
+
+    .chart-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 0.78rem;
+    }
+
+    .chart-time-filters {
+      display: flex;
+      gap: 4px;
+    }
+
+    .time-filter-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+
+    .time-filter-btn.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .chart-stats-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .chart-stat-box {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      padding: 8px 10px;
       text-align: center;
     }
 
@@ -542,17 +659,21 @@
           </div>
 
           <div class="temp-block">
-            <div class="temp-label">Aktuální výkon</div>
+            <div class="temp-label">Vypočtený 3f výkon</div>
             <div class="stat-val-medium" style="color: #fbbf24;">
-              <span id="val-unit-power">--</span> <span class="temp-unit" id="val-unit-power-unit" style="font-size: 0.9rem;">%</span>
+              <span id="val-unit-power-kw">--</span> <span class="temp-unit" style="font-size: 0.9rem;">kW</span>
             </div>
-            <div class="sub-note">Vytížení jednotky</div>
+            <div class="sub-note">3×400V • cos φ 0.85</div>
           </div>
         </div>
 
-        <!-- DIAGNOSTICKÉ TEPLOTY CHLADICÍHO OKRUHU -->
-        <div class="temp-label" style="text-align: left; margin: 12px 0 6px 4px;">Teploty chladicího okruhu jednotky:</div>
+        <!-- VÝKON JEDNOTKY V PROCENTECH A TEPLOTY CHLAZENÍ -->
+        <div class="temp-label" style="text-align: left; margin: 12px 0 6px 4px;">Výkon v procentech a teploty chlazení:</div>
         <div class="stats-grid-4">
+          <div class="stat-mini-block" style="border-color: rgba(251, 191, 36, 0.3);">
+            <div class="temp-label" style="color: #fbbf24;">Výkon jednotky</div>
+            <div class="stat-val-small" style="color: #fde047;"><span id="val-unit-power">--</span>%</div>
+          </div>
           <div class="stat-mini-block">
             <div class="temp-label">Sání (ts)</div>
             <div class="stat-val-small"><span id="val-unit-ts">--</span>°C</div>
@@ -564,10 +685,6 @@
           <div class="stat-mini-block">
             <div class="temp-label">Výparník (te)</div>
             <div class="stat-val-small"><span id="val-unit-te">--</span>°C</div>
-          </div>
-          <div class="stat-mini-block">
-            <div class="temp-label">Kondenzát (tcj)</div>
-            <div class="stat-val-small"><span id="val-unit-tcj">--</span>°C</div>
           </div>
         </div>
       </div>
@@ -642,6 +759,57 @@
         </div>
       </div>
 
+      <!-- CARD 5: JAVASCRIPT GRAFY A ZÁZNAM VELIČIN -->
+      <div class="card" id="card-charts">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📈</span>
+            <span>Historie a grafy veličin</span>
+          </div>
+          <span class="badge badge-power" id="badge-chart-points">0 bodů</span>
+        </div>
+
+        <!-- TABS PRO VÝBĚR GRAFU -->
+        <div class="chart-tabs">
+          <button class="chart-tab active" onclick="setChartType('current_power')">1. Proud & Výkon (kW)</button>
+          <button class="chart-tab" onclick="setChartType('power_pct')">2. Výkon jednotky (%)</button>
+          <button class="chart-tab" onclick="setChartType('water')">3. Teplota topné vody</button>
+          <button class="chart-tab" onclick="setChartType('outdoor')">4. Teplota venku</button>
+          <button class="chart-tab" onclick="setChartType('all')">5. Všechny veličiny</button>
+        </div>
+
+        <!-- TOOLBAR: ČASOVÝ ROZSAH A AKCE -->
+        <div class="chart-toolbar">
+          <div class="chart-time-filters">
+            <button class="time-filter-btn active" onclick="setTimeFilter(15)">15 m</button>
+            <button class="time-filter-btn" onclick="setTimeFilter(60)">1 h</button>
+            <button class="time-filter-btn" onclick="setTimeFilter(360)">6 h</button>
+            <button class="time-filter-btn" onclick="setTimeFilter(1440)">24 h</button>
+            <button class="time-filter-btn" onclick="setTimeFilter(0)">Vše</button>
+          </div>
+
+          <div style="display: flex; gap: 6px;">
+            <button class="btn-secondary" style="padding: 3px 8px; font-size: 0.72rem;" onclick="exportHistoryCsv()">📥 CSV</button>
+            <button class="btn-secondary" style="padding: 3px 8px; font-size: 0.72rem;" onclick="clearHistory()">🗑️ Smazat</button>
+          </div>
+        </div>
+
+        <!-- CANVAS PLOTTER -->
+        <div class="canvas-container">
+          <canvas id="main-chart"></canvas>
+        </div>
+
+        <!-- LEGENDA GRAFU -->
+        <div class="chart-legend" id="chart-legend">
+          <!-- Dynamicky naplněno podle aktivního grafu -->
+        </div>
+
+        <!-- STATISTICKÉ SHRNUTÍ -->
+        <div class="chart-stats-summary" id="chart-stats-summary">
+          <!-- Dynamicky naplněno podle aktivního grafu -->
+        </div>
+      </div>
+
       <!-- STATUS BAR -->
       <div class="status-bar">
         <div>
@@ -658,7 +826,7 @@
   <div id="toast" class="toast">Hodnota uložena</div>
 
   <script>
-    // State
+    // Configuration & State
     let backendUrl = localStorage.getItem('xcc_backend') || '';
     let currentUser = null;
     let pollTimer = null;
@@ -674,11 +842,68 @@
     let targetHeatTemp = null;
     let targetTuvTemp = null;
 
+    // History Storage
+    const MAX_HISTORY_POINTS = 1500;
+    let historyData = [];
+
+    // Chart Configuration
+    let activeChartType = 'current_power';
+    let activeTimeFilterMin = 15;
+    let chartCanvas = null;
+    let chartCtx = null;
+    let hoverIndex = null;
+
+    // Load History on startup
+    try {
+      const stored = localStorage.getItem('xcc_history_series');
+      if (stored) {
+        historyData = JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn('Nelze načíst historii z localStorage:', e);
+      historyData = [];
+    }
+
     // Initialize
     window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('input-backend').value = backendUrl;
+      initCanvas();
       checkAuth();
     });
+
+    function initCanvas() {
+      chartCanvas = document.getElementById('main-chart');
+      if (!chartCanvas) return;
+      chartCtx = chartCanvas.getContext('2d');
+
+      // Mouse / Touch Interactivity for inspect cursor
+      const handlePointer = (e) => {
+        const rect = chartCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const x = clientX - rect.left;
+        const pts = getFilteredHistory();
+        if (pts.length < 2) return;
+        const padL = 45, padR = 15;
+        const plotW = rect.width - padL - padR;
+        const ratio = Math.max(0, Math.min(1, (x - padL) / plotW));
+        hoverIndex = Math.round(ratio * (pts.length - 1));
+        drawChart();
+      };
+
+      const handleLeave = () => {
+        hoverIndex = null;
+        drawChart();
+      };
+
+      chartCanvas.addEventListener('mousemove', handlePointer);
+      chartCanvas.addEventListener('mouseleave', handleLeave);
+      chartCanvas.addEventListener('touchmove', handlePointer, { passive: true });
+      chartCanvas.addEventListener('touchend', handleLeave);
+
+      window.addEventListener('resize', () => {
+        drawChart();
+      });
+    }
 
     function toggleSettings() {
       const el = document.getElementById('settings-group');
@@ -734,6 +959,7 @@
       document.getElementById('view-login').style.display = 'none';
       document.getElementById('view-dashboard').style.display = 'block';
       document.getElementById('label-user').innerText = 'Přihlášen: ' + (currentUser?.login || 'Uživatel');
+      setTimeout(drawChart, 100);
     }
 
     async function handleLogin(e) {
@@ -822,8 +1048,11 @@
         processFunctionsData(data);
         renderData();
 
-        // Also query getData.json for live units & tempOut projection
+        // Query deep units & tempOut projection
         await fetchDetailedData();
+
+        // Record history snapshot
+        recordHistorySnapshot();
 
         document.getElementById('status-text').innerText = 'Připojeno k PLC';
         document.getElementById('status-time').innerText = 'Aktualizováno: ' + new Date().toLocaleTimeString();
@@ -835,7 +1064,6 @@
       }
     }
 
-    // Secondary fetch to ensure deep unit metrics and tempOut are always populated
     async function fetchDetailedData() {
       const gid = globalObj?.idGlobal || 'null';
       const mask = {
@@ -867,9 +1095,7 @@
             renderUnitData();
           }
         }
-      } catch (e) {
-        // Silent catch for secondary detail poll
-      }
+      } catch (e) {}
     }
 
     function processFunctionsData(data) {
@@ -884,7 +1110,6 @@
 
       globalObj = components['null'] || components['Global'] || globalObj || {};
 
-      // Find specialized components
       for (const id in components) {
         const c = components[id];
         if (c.TYPE === 'xcc.component.TopnyOkruh' && !heatComponent) heatComponent = c;
@@ -900,7 +1125,7 @@
     }
 
     function renderData() {
-      // 1. Render Topny Okruh
+      // 1. Topný okruh
       if (heatComponent) {
         document.getElementById('title-heat').innerText = heatComponent.name || 'Topný okruh';
         const st = heatComponent.status || {};
@@ -924,7 +1149,7 @@
         }
       }
 
-      // 2. Render TUV
+      // 2. TUV
       if (tuvComponent) {
         document.getElementById('title-tuv').innerText = tuvComponent.name || 'Ohřev TUV';
         const st = tuvComponent.status || {};
@@ -943,12 +1168,12 @@
         document.getElementById('status-tuv').innerText = st.on === false ? 'Vypnuto' : 'Aktivní';
       }
 
-      // 3. Render Outdoor Temperature and Unit Metrics
+      // 3. Jednotka TČ a venkovní teplota
       renderUnitData();
     }
 
     function renderUnitData() {
-      // A. Venkovní teplota (Outdoor Temperature)
+      // A. Venkovní teplota
       let outdoorVal = null;
       if (globalObj && globalObj.tempOut !== undefined && globalObj.tempOut !== null) {
         outdoorVal = globalObj.tempOut;
@@ -963,12 +1188,12 @@
         document.getElementById('pill-weather').style.display = 'inline-flex';
       }
 
-      // B. Jednotka TČ (Otáčky, Proud, Výkon, Teploty chlazení)
+      // B. Jednotka TČ
       const units = globalObj?.units || [];
       const u = units.length > 0 ? units[0] : null;
 
       if (u) {
-        // Otáčky ventilátoru (hlavní jsou dolní otáčky: fanLo)
+        // Otáčky ventilátoru (priorita pro dolní otáčky: fanLo)
         const fanLo = u.fanLo ?? '--';
         const fanUp = u.fanUp ?? '--';
         const rpmDisplay = typeof fanLo === 'number' ? fanLo : (typeof fanUp === 'number' ? fanUp : '--');
@@ -983,19 +1208,21 @@
         const curr = u.curr !== undefined && u.curr !== null ? (typeof u.curr === 'number' ? u.curr.toFixed(1) : u.curr) : '--';
         document.getElementById('val-unit-curr').innerText = curr;
 
-        // Výkon
-        let powerVal = u.power;
-        let powerUnit = '%';
-        if (powerVal === undefined || powerVal === null) {
-          if (inverterComponent?.powerFve !== undefined) {
-            powerVal = inverterComponent.powerFve;
-            powerUnit = 'W';
-          }
+        // Vypočtený 3-fázový činný výkon P = sqrt(3) * 400V * I * cos(phi)
+        // Předpoklad pro kompresor: 400 V, cos phi = 0.85
+        // P = 1.732 * 400 * I * 0.85 = 588.9 * I (W) = 0.589 * I (kW)
+        if (typeof u.curr === 'number') {
+          const powerKw = (Math.sqrt(3) * 400 * u.curr * 0.85) / 1000.0;
+          document.getElementById('val-unit-power-kw').innerText = powerKw.toFixed(2);
+        } else {
+          document.getElementById('val-unit-power-kw').innerText = '--';
         }
-        document.getElementById('val-unit-power').innerText = powerVal !== undefined && powerVal !== null ? (typeof powerVal === 'number' ? Math.round(powerVal) : powerVal) : '--';
-        document.getElementById('val-unit-power-unit').innerText = powerUnit;
 
-        // Teploty okruhu (ts, td, te, tcj)
+        // Výkon v procentech
+        const powerPct = u.power !== undefined && u.power !== null ? (typeof u.power === 'number' ? Math.round(u.power) : u.power) : '--';
+        document.getElementById('val-unit-power').innerText = powerPct;
+
+        // Teploty chlazení
         document.getElementById('val-unit-ts').innerText = formatTemp(u.ts);
         document.getElementById('val-unit-td').innerText = formatTemp(u.td);
         document.getElementById('val-unit-te').innerText = formatTemp(u.te);
@@ -1070,6 +1297,381 @@
         }
       } catch (err) {
         showToast('Nelze odeslat změnu na PLC');
+      }
+    }
+
+    // ==========================================
+    // DATA RECORDING & JAVASCRIPT CHARTS ENGINE
+    // ==========================================
+
+    function recordHistorySnapshot() {
+      const units = globalObj?.units || [];
+      const u = units.length > 0 ? units[0] : null;
+
+      const curr = u && typeof u.curr === 'number' ? u.curr : null;
+      const powerKw = curr !== null ? (Math.sqrt(3) * 400 * curr * 0.85) / 1000.0 : null;
+      const powerPct = u && typeof u.power === 'number' ? u.power : null;
+
+      const stHeat = heatComponent?.status || {};
+      const waterAct = stHeat.actTemp ?? heatComponent?.actualWater ?? null;
+      const waterReq = stHeat.reqTemp ?? heatComponent?.requestWater ?? heatComponent?.requestAir ?? null;
+
+      let tempOut = null;
+      if (globalObj && typeof globalObj.tempOut === 'number') {
+        tempOut = globalObj.tempOut;
+      } else if (tempOutComponent) {
+        tempOut = tempOutComponent.status?.actTemp ?? tempOutComponent.actTemp ?? null;
+      }
+
+      // Check if we have at least one valid measurement
+      if (curr === null && powerPct === null && waterAct === null && tempOut === null) {
+        return;
+      }
+
+      const point = {
+        t: Date.now(),
+        curr: curr !== null ? +curr.toFixed(2) : null,
+        powerKw: powerKw !== null ? +powerKw.toFixed(2) : null,
+        powerPct: powerPct !== null ? +powerPct.toFixed(1) : null,
+        waterAct: typeof waterAct === 'number' ? +waterAct.toFixed(1) : null,
+        waterReq: typeof waterReq === 'number' ? +waterReq.toFixed(1) : null,
+        tempOut: typeof tempOut === 'number' ? +tempOut.toFixed(1) : null
+      };
+
+      // Don't record duplicates if identical within last 2 seconds
+      if (historyData.length > 0) {
+        const last = historyData[historyData.length - 1];
+        if (point.t - last.t < 2000) return;
+      }
+
+      historyData.push(point);
+
+      // Enforce ring-buffer size
+      if (historyData.length > MAX_HISTORY_POINTS) {
+        historyData.splice(0, historyData.length - MAX_HISTORY_POINTS);
+      }
+
+      // Save every 5th point to localStorage to keep persistence without lag
+      if (historyData.length % 5 === 0) {
+        try {
+          localStorage.setItem('xcc_history_series', JSON.stringify(historyData));
+        } catch (e) {}
+      }
+
+      document.getElementById('badge-chart-points').innerText = `${historyData.length} bodů`;
+      drawChart();
+    }
+
+    function setChartType(type) {
+      activeChartType = type;
+      document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.chart-tab')).find(b => b.getAttribute('onclick').includes(type));
+      if (activeBtn) activeBtn.classList.add('active');
+      hoverIndex = null;
+      drawChart();
+    }
+
+    function setTimeFilter(mins) {
+      activeTimeFilterMin = mins;
+      document.querySelectorAll('.time-filter-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.time-filter-btn')).find(b => b.getAttribute('onclick').includes(`(${mins})`));
+      if (activeBtn) activeBtn.classList.add('active');
+      hoverIndex = null;
+      drawChart();
+    }
+
+    function clearHistory() {
+      if (confirm('Opravdu chcete smazat historii naměřených dat?')) {
+        historyData = [];
+        localStorage.removeItem('xcc_history_series');
+        document.getElementById('badge-chart-points').innerText = '0 bodů';
+        hoverIndex = null;
+        drawChart();
+        showToast('Historie grafů byla promazána');
+      }
+    }
+
+    function exportHistoryCsv() {
+      if (historyData.length === 0) {
+        alert('Žádná data pro export');
+        return;
+      }
+      let csv = 'Timestamp,Čas,Proud_A,Vykon_kW,Vykon_pct,TeplotaVodyAkt_C,TeplotaVodyCil_C,TeplotaVenku_C\n';
+      for (const d of historyData) {
+        const timeStr = new Date(d.t).toISOString();
+        csv += `${d.t},${timeStr},${d.curr ?? ''},${d.powerKw ?? ''},${d.powerPct ?? ''},${d.waterAct ?? ''},${d.waterReq ?? ''},${d.tempOut ?? ''}\n`;
+      }
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `xcc_history_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function getFilteredHistory() {
+      if (activeTimeFilterMin === 0) return historyData;
+      const cutoff = Date.now() - (activeTimeFilterMin * 60 * 1000);
+      return historyData.filter(d => d.t >= cutoff);
+    }
+
+    // High Performance HTML5 Canvas Chart Renderer
+    function drawChart() {
+      if (!chartCanvas || !chartCtx) return;
+
+      const rect = chartCanvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      chartCanvas.width = rect.width * dpr;
+      chartCanvas.height = rect.height * dpr;
+      chartCtx.resetTransform();
+      chartCtx.scale(dpr, dpr);
+
+      const width = rect.width;
+      const height = rect.height;
+      const ctx = chartCtx;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const pts = getFilteredHistory();
+      const legendEl = document.getElementById('chart-legend');
+      const statsEl = document.getElementById('chart-stats-summary');
+
+      if (pts.length < 2) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Čekám na dostatek naměřených dat pro zobrazení grafu...', width / 2, height / 2);
+        legendEl.innerHTML = '';
+        statsEl.innerHTML = '';
+        return;
+      }
+
+      // Define series based on active tab
+      let seriesConfig = [];
+      if (activeChartType === 'current_power') {
+        seriesConfig = [
+          { key: 'curr', label: 'Odebíraný proud', unit: 'A', color: '#38bdf8', yAxis: 0 },
+          { key: 'powerKw', label: 'Vypočtený výkon (3×400V)', unit: 'kW', color: '#fbbf24', yAxis: 1 }
+        ];
+      } else if (activeChartType === 'power_pct') {
+        seriesConfig = [
+          { key: 'powerPct', label: 'Výkon jednotky', unit: '%', color: '#34d399', yAxis: 0, minFixed: 0, maxFixed: 100 }
+        ];
+      } else if (activeChartType === 'water') {
+        seriesConfig = [
+          { key: 'waterAct', label: 'Aktuální teplota vody', unit: '°C', color: '#f97316', yAxis: 0 },
+          { key: 'waterReq', label: 'Požadovaná teplota vody', unit: '°C', color: '#f43f5e', yAxis: 0, dashed: true }
+        ];
+      } else if (activeChartType === 'outdoor') {
+        seriesConfig = [
+          { key: 'tempOut', label: 'Venkovní teplota', unit: '°C', color: '#c084fc', yAxis: 0 }
+        ];
+      } else if (activeChartType === 'all') {
+        seriesConfig = [
+          { key: 'waterAct', label: 'Voda akt.', unit: '°C', color: '#f97316', yAxis: 0 },
+          { key: 'waterReq', label: 'Voda cíl', unit: '°C', color: '#f43f5e', yAxis: 0, dashed: true },
+          { key: 'tempOut', label: 'Venku', unit: '°C', color: '#c084fc', yAxis: 0 },
+          { key: 'curr', label: 'Proud', unit: 'A', color: '#38bdf8', yAxis: 1 },
+          { key: 'powerKw', label: 'Výkon', unit: 'kW', color: '#fbbf24', yAxis: 1 }
+        ];
+      }
+
+      // Render Legend HTML
+      legendEl.innerHTML = seriesConfig.map(s => `
+        <div class="legend-item">
+          <span class="legend-dot" style="background: ${s.color};"></span>
+          <span>${s.label} (${s.unit})</span>
+        </div>
+      `).join('');
+
+      // Render Stats Boxes
+      statsEl.innerHTML = seriesConfig.map(s => {
+        const vals = pts.map(p => p[s.key]).filter(v => v !== null && typeof v === 'number');
+        if (vals.length === 0) return '';
+        const min = Math.min(...vals).toFixed(1);
+        const max = Math.max(...vals).toFixed(1);
+        const cur = vals[vals.length - 1].toFixed(1);
+        return `
+          <div class="chart-stat-box">
+            <div class="temp-label" style="color: ${s.color};">${s.label}</div>
+            <div style="font-weight: 700; color: #fff;">${cur} <span style="font-size:0.75rem; color: #94a3b8;">${s.unit}</span></div>
+            <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 2px;">Min: ${min} | Max: ${max}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Layout geometry
+      const padLeft = 45;
+      const padRight = (seriesConfig.some(s => s.yAxis === 1)) ? 45 : 15;
+      const padTop = 20;
+      const padBottom = 26;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padTop - padBottom;
+
+      // Compute min/max for Axis 0 and Axis 1
+      function getAxisRange(yAxisIndex) {
+        const relevantSeries = seriesConfig.filter(s => (s.yAxis || 0) === yAxisIndex);
+        if (relevantSeries.length === 0) return { min: 0, max: 10 };
+
+        let vals = [];
+        for (const s of relevantSeries) {
+          for (const p of pts) {
+            const val = p[s.key];
+            if (val !== null && typeof val === 'number') vals.push(val);
+          }
+        }
+        if (vals.length === 0) return { min: 0, max: 10 };
+
+        let min = Math.min(...vals);
+        let max = Math.max(...vals);
+
+        if (relevantSeries[0].minFixed !== undefined) min = relevantSeries[0].minFixed;
+        if (relevantSeries[0].maxFixed !== undefined) max = relevantSeries[0].maxFixed;
+
+        if (min === max) { min -= 1; max += 1; }
+        const margin = (max - min) * 0.1;
+        return {
+          min: relevantSeries[0].minFixed !== undefined ? min : min - margin,
+          max: relevantSeries[0].maxFixed !== undefined ? max : max + margin
+        };
+      }
+
+      const rangeY0 = getAxisRange(0);
+      const rangeY1 = getAxisRange(1);
+
+      // Draw Grid Lines & Left Axis
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1;
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'right';
+
+      const gridSteps = 4;
+      for (let i = 0; i <= gridSteps; i++) {
+        const y = padTop + (plotH / gridSteps) * i;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, y);
+        ctx.lineTo(width - padRight, y);
+        ctx.stroke();
+
+        // Axis 0 labels (left)
+        const val0 = rangeY0.max - ((rangeY0.max - rangeY0.min) / gridSteps) * i;
+        ctx.fillText(val0.toFixed(1), padLeft - 6, y + 3);
+
+        // Axis 1 labels (right) if present
+        if (seriesConfig.some(s => s.yAxis === 1)) {
+          ctx.textAlign = 'left';
+          const val1 = rangeY1.max - ((rangeY1.max - rangeY1.min) / gridSteps) * i;
+          ctx.fillText(val1.toFixed(1), width - padRight + 6, y + 3);
+          ctx.textAlign = 'right';
+        }
+      }
+
+      // Draw Time labels on X Axis
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#64748b';
+      const timeSteps = Math.min(5, pts.length);
+      for (let i = 0; i < timeSteps; i++) {
+        const idx = Math.floor((pts.length - 1) * (i / (timeSteps - 1)));
+        const x = padLeft + (plotW / (pts.length - 1)) * idx;
+        const d = new Date(pts[idx].t);
+        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        ctx.fillText(timeStr, x, height - 8);
+      }
+
+      // Draw each series line
+      seriesConfig.forEach(s => {
+        const range = (s.yAxis === 1) ? rangeY1 : rangeY0;
+        const diff = (range.max - range.min) || 1;
+
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = 2;
+        if (s.dashed) ctx.setLineDash([4, 4]);
+        else ctx.setLineDash([]);
+
+        ctx.beginPath();
+        let started = false;
+
+        for (let i = 0; i < pts.length; i++) {
+          const val = pts[i][s.key];
+          if (val === null || typeof val !== 'number') {
+            started = false;
+            continue;
+          }
+          const x = padLeft + (plotW / (pts.length - 1)) * i;
+          const y = padTop + plotH - ((val - range.min) / diff) * plotH;
+
+          if (!started) {
+            ctx.moveTo(x, y);
+            started = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
+
+      // Hover Cursor & Tooltip Inspector
+      if (hoverIndex !== null && hoverIndex >= 0 && hoverIndex < pts.length) {
+        const pt = pts[hoverIndex];
+        const hx = padLeft + (plotW / (pts.length - 1)) * hoverIndex;
+
+        // Vertical guide line
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.moveTo(hx, padTop);
+        ctx.lineTo(hx, padTop + plotH);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Highlight dots on each line
+        seriesConfig.forEach(s => {
+          const range = (s.yAxis === 1) ? rangeY1 : rangeY0;
+          const val = pt[s.key];
+          if (val === null || typeof val !== 'number') return;
+          const diff = (range.max - range.min) || 1;
+          const hy = padTop + plotH - ((val - range.min) / diff) * plotH;
+
+          ctx.fillStyle = s.color;
+          ctx.beginPath();
+          ctx.arc(hx, hy, 4, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Tooltip Box
+        const timeLabel = new Date(pt.t).toLocaleTimeString();
+        const tooltipLines = [timeLabel];
+        seriesConfig.forEach(s => {
+          const val = pt[s.key];
+          if (val !== null && typeof val === 'number') {
+            tooltipLines.push(`${s.label}: ${val.toFixed(1)} ${s.unit}`);
+          }
+        });
+
+        ctx.font = '11px sans-serif';
+        const boxW = 160;
+        const boxH = tooltipLines.length * 16 + 12;
+        let boxX = hx + 10;
+        if (boxX + boxW > width - 10) boxX = hx - boxW - 10;
+        let boxY = padTop + 10;
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, boxW, boxH, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.textAlign = 'left';
+        tooltipLines.forEach((line, idx) => {
+          ctx.fillStyle = idx === 0 ? '#38bdf8' : '#f8fafc';
+          ctx.fillText(line, boxX + 8, boxY + 16 + idx * 16);
+        });
       }
     }
   </script>
