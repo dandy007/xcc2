@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect XCC PLC",
+        "description": "Enter the controller address and login credentials.",
+        "data": {
+          "host": "Controller address",
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to the controller.",
+      "invalid_auth": "Login failed. Check the username and password.",
+      "invalid_response": "The controller returned an invalid response.",
+      "http_403": "The account is not allowed to read controller data.",
+      "http_404": "The controller API was not found. Check the address.",
+      "unknown": "An unexpected error occurred."
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Připojit XCC PLC",
+        "description": "Zadejte adresu regulátoru a přihlašovací údaje.",
+        "data": {
+          "host": "Adresa regulátoru",
+          "username": "Uživatelské jméno",
+          "password": "Heslo"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "K regulátoru se nelze připojit.",
+      "invalid_auth": "Přihlášení se nezdařilo. Zkontrolujte jméno a heslo.",
+      "invalid_response": "Regulátor vrátil neplatnou odpověď.",
+      "http_403": "Účet nemá oprávnění pro přístup k datům.",
+      "http_404": "API regulátoru nebylo nalezeno. Zkontrolujte adresu.",
+      "unknown": "Nastala neočekávaná chyba."
+    }
+  }
+}
