@@ -61,3 +61,46 @@ class XCCApi:
         if isinstance(data, dict):
             return {str(key): value for key, value in data.items() if isinstance(value, dict)}
         raise XCCApiError("invalid_response")
+
+    async def async_get_extended_data(self) -> dict[str, Any]:
+        """Fetch the global status and heat-pump unit projection."""
+        unit_mask = {
+            key: 1
+            for key in (
+                "pump",
+                "power",
+                "tcj",
+                "mototime",
+                "fanUp",
+                "fanLo",
+                "ts",
+                "td",
+                "te",
+                "curr",
+            )
+        }
+        mask = {
+            "null": {
+                key: 1
+                for key in (
+                    "tempOut",
+                    "powerAct",
+                    "tempAct",
+                    "tempReq",
+                    "hdo",
+                    "hdoIgnore",
+                    "hdoIgnoreTemp",
+                    "on",
+                    "error",
+                )
+            }
+        }
+        mask["null"]["units"] = [unit_mask]
+        data = await self._request(
+            "POST",
+            "/getData.json?status&extended",
+            json=mask,
+        )
+        if not isinstance(data, dict):
+            raise XCCApiError("invalid_response")
+        return data

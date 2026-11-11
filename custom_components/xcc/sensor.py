@@ -6,7 +6,7 @@ from collections.abc import Iterable
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass, SensorStateClass
-from homeassistant.const import UnitOfElectricCurrent, UnitOfTemperature
+from homeassistant.const import PERCENTAGE, UnitOfElectricCurrent, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -20,12 +20,43 @@ async def async_setup_entry(
     """Set up read-only sensors for scalar component properties."""
     coordinator = entry.runtime_data
     entities: list[XCCSensor] = []
-    for component_id, component in coordinator.data.items():
+
+    for component_id, component in coordinator.data.components.items():
         for path, value in _scalar_values(component):
             if isinstance(value, bool):
                 continue
-            entity = XCCSensor(coordinator, entry.entry_id, component_id, component, path, value)
-            entities.append(entity)
+            entities.append(
+                XCCSensor(
+                    coordinator,
+                    entry.entry_id,
+                    "component",
+                    component_id,
+                    component,
+                    path,
+                    value,
+                )
+            )
+
+    for path, value in _scalar_values(coordinator.data.global_data):
+        if not isinstance(value, bool):
+            entities.append(
+                XCCSensor(coordinator, entry.entry_id, "global", "0", None, path, value)
+            )
+
+    for index, unit in enumerate(coordinator.data.units):
+        for path, value in _scalar_values(unit):
+            if not isinstance(value, bool):
+                entities.append(
+                    XCCSensor(
+                        coordinator,
+                        entry.entry_id,
+                        "unit",
+                        str(index),
+                        None,
+                        path,
+                        value,
+                    )
+                )
     async_add_entities(entities)
 
 
@@ -46,8 +77,17 @@ class XCCSensor(XCCEntity, SensorEntity):
             self._attr_native_unit_of_measurement = UnitOfElectricCurrent.AMPERE
             if isinstance(self.value, (int, float)):
                 self._attr_state_class = SensorStateClass.MEASUREMENT
+        elif key in {"power", "poweract"}:
+            self._attr_native_unit_of_measurement = PERCENTAGE
+            if isinstance(self.value, (int, float)):
+                self._attr_state_class = SensorStateClass.MEASUREMENT
+        elif key in {"fanup", "fanlo"}:
+            self._attr_native_unit_of_measurement = "rpm"
+            if isinstance(self.value, (int, float)):
+                self._attr_state_class = SensorStateClass.MEASUREMENT
         elif isinstance(self.value, (int, float)):
-            self._attr_state_class = SensorStateClass.MEASUREMENT
+            if key != "mototime":
+                self._attr_state_class = SensorStateClass.MEASUREMENT
 
     @property
     def native_value(self):
@@ -58,7 +98,7 @@ class XCCSensor(XCCEntity, SensorEntity):
 def _scalar_values(data: dict[str, Any], prefix: tuple[str, ...] = ()) -> Iterable[tuple[tuple[str, ...], Any]]:
     """Recursively yield supported leaf values, omitting identity metadata."""
     for key, value in data.items():
-        if key in {"id", "name", "TYPE", "type", "icon"}:
+        if key in {"id", "idGlobal", "name", "TYPE", "type", "icon", "owner", "address", "time"}:
             continue
         path = (*prefix, str(key))
         if isinstance(value, dict):

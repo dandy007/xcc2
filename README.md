@@ -2,7 +2,7 @@
 
 Vlastní integrace pro čtení stavů regulátoru XCC přes jeho HTTP JSON API. Data se obnovují každých 10 sekund.
 
-Integrace vytváří zařízení pro každou komponentu PLC a automaticky vystaví její skalární hodnoty jako senzory. Booleovské hodnoty se zobrazí jako binární senzory. Tato první verze je pouze pro čtení.
+Integrace vytváří zařízení pro každou komponentu PLC a automaticky vystaví její skalární hodnoty jako senzory. Přidává také systémové senzory a senzory jednotlivých tepelných čerpadel, včetně teplot, proudu, výkonu a otáček. Booleovské hodnoty se zobrazí jako binární senzory. Integrace je pouze pro čtení.
 
 ## Instalace přes HACS
 
@@ -12,7 +12,7 @@ Integrace vytváří zařízení pro každou komponentu PLC a automaticky vystav
 4. Vyhledejte **XCC PLC**, nainstalujte ji a restartujte Home Assistant.
 5. Otevřete **Nastavení → Zařízení a služby → Přidat integraci**, vyhledejte **XCC PLC** a zadejte adresu regulátoru, uživatelské jméno a heslo.
 
-Ve složce repozitáře musí být `hacs.json` a `custom_components/xcc/`. Repozitář zatím nemá nastavený GitHub remote, proto je potřeba před instalací nahrát tuto větev do GitHub repozitáře a použít jeho URL.
+Ve složce repozitáře musí být `hacs.json` a `custom_components/xcc/`. Aby šel repozitář přidat do HACS, musí být veřejný na GitHubu. Poté vložte jeho URL jako vlastní repozitář typu **Integration**.
 
 ## Lokální instalace pro vývoj
 

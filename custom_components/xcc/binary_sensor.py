@@ -15,11 +15,38 @@ async def async_setup_entry(
 ) -> None:
     """Set up binary sensors for boolean component properties."""
     coordinator = entry.runtime_data
-    entities = [
-        XCCBinarySensor(coordinator, entry.entry_id, component_id, component, path, value)
-        for component_id, component in coordinator.data.items()
-        for path, value in _boolean_values(component)
-    ]
+    entities: list[XCCBinarySensor] = []
+    for component_id, component in coordinator.data.components.items():
+        entities.extend(
+            XCCBinarySensor(
+                coordinator,
+                entry.entry_id,
+                "component",
+                component_id,
+                component,
+                path,
+                value,
+            )
+            for path, value in _boolean_values(component)
+        )
+
+    entities.extend(
+        XCCBinarySensor(coordinator, entry.entry_id, "global", "0", None, path, value)
+        for path, value in _boolean_values(coordinator.data.global_data)
+    )
+    for index, unit in enumerate(coordinator.data.units):
+        entities.extend(
+            XCCBinarySensor(
+                coordinator,
+                entry.entry_id,
+                "unit",
+                str(index),
+                None,
+                path,
+                value,
+            )
+            for path, value in _boolean_values(unit)
+        )
     async_add_entities(entities)
 
 
@@ -35,7 +62,7 @@ class XCCBinarySensor(XCCEntity, BinarySensorEntity):
 def _boolean_values(data: dict, prefix: tuple[str, ...] = ()):
     """Recursively yield boolean leaf values, omitting identity metadata."""
     for key, value in data.items():
-        if key in {"id", "name", "TYPE", "type", "icon"}:
+        if key in {"id", "idGlobal", "name", "TYPE", "type", "icon", "owner", "address", "time"}:
             continue
         path = (*prefix, str(key))
         if isinstance(value, dict):

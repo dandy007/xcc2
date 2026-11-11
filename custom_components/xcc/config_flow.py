@@ -32,6 +32,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 await api.async_login()
                 await api.async_get_functions()
+                await api.async_get_extended_data()
             except XCCApiError as err:
                 error = str(err)
                 errors["base"] = error if error in {
@@ -71,6 +72,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         api = XCCApi(host, data[CONF_USERNAME], data[CONF_PASSWORD], session)
         await api.async_login()
         await api.async_get_functions()
+        await api.async_get_extended_data()
     finally:
         await session.close()
     return {CONF_HOST: host}
